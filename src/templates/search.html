@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Serarch Result</h2>
+{% if queryset %}
+  {% for post in queryset %}
+    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a><br>
+  {% endfor %}
+{% else %}
+<h3>Nothing Found</h3>
+{% endif %}
+
+{% endblock content %}
