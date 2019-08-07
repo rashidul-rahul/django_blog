@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post, Category, Author
+from .models import Post, Category, Author, ViewPost
 from .forms import CommentForm, PostForm
 from marketing.models import Signup
 from django.core.paginator import Paginator
@@ -66,6 +66,7 @@ def blog(request):
 def post(request, id):
     post = get_object_or_404(Post, id=id)
     recent_post = Post.objects.order_by('-timestamp')[:3]
+    ViewPost.objects.get_or_create(user=request.user, post=post)
     category_num = get_count_category()
     form = CommentForm(request.POST or None)
     if request.method == 'POST':

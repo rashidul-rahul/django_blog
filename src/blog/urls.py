@@ -16,6 +16,7 @@ urlpatterns = [
     path('post/<id>/delte', delete_post, name='post_delete'),
     path('tinymce/', include('tinymce.urls')),
     re_path(r'^admin/filebrowser/', site.urls),
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:
