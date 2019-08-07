@@ -1,12 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post, Category
-from .forms import CommentForm
+from .models import Post, Category, Author
+from .forms import CommentForm, PostForm
 from marketing.models import Signup
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.urls import reverse
 
+
+def get_author(user):
+    qs = Author.objects.filter(user=user)
+    if qs.exists():
+        return qs[0]
+    return None
 
 def search(request):
     post_list = Post.objects.order_by('-id')
@@ -75,3 +81,44 @@ def post(request, id):
         'category_num':category_num,
     }
     return render(request, 'post.html', context)
+
+def create_post(request):
+    title = 'Create'
+    form = PostForm(request.POST or None, request.FILES or None)
+    author = get_author(request.user)
+    if request.method == 'POST':
+        if form.is_valid:
+            form.instance.author = author
+            form.save()
+            return redirect(reverse('post', kwargs={
+            'id':form.instance.id
+            }))
+    context = {
+        'title':title,
+        'form':form,
+    }
+    return render(request, 'create_post.html', context)
+
+
+def update_post(request, id):
+    title = 'Update'
+    post = get_object_or_404(Post, id=id)
+    form = PostForm(request.POST or None, request.FILES or None, instance=post)
+    author = get_author(request.user)
+    if request.method == 'POST':
+        if form.is_valid:
+            form.instance.author = author
+            form.save()
+            return redirect(reverse('post', kwargs={
+            'id':form.instance.id
+            }))
+    context = {
+        'form':form,
+        'title':title
+    }
+    return render(request, 'create_post.html', context)
+
+def delete_post(request, id):
+    post = get_object_or_404(Post, id=id)
+    post.delete()
+    return redirect(reverse('blog'))
